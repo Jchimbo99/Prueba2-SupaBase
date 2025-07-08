@@ -1,30 +1,56 @@
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
+import { MaterialIcons } from '@expo/vector-icons'
 
 export default function LoginScreen( {navigation}: any) {
+  const [correo, setCorreo] = useState('')
+  const [contrasena, setContrasena] = useState('')
+
+
   return (
-    <View>
-      <Text>LoginScreen</Text>
-      <TextInput placeholder='Email'  style={styles.input}/>
-      <TextInput placeholder='Password' style={styles.input}/>
+    <View style={styles.container}>
+
+      <Text style={styles.title}>LoginScreen</Text>
+      <MaterialIcons name='login' size={30} color='black' />
+      <TextInput placeholder='Email'  style={styles.input} onChangeText={setCorreo}/>
+      <TextInput placeholder='Password' style={styles.input} onChangeText={setContrasena}/>
+
      <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}>
-      <Text>Login</Text>
+      <Text style={styles.textButton}>Login</Text>
      </TouchableOpacity>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
   input: {
     borderWidth: 1,
     borderColor: 'gray',
     padding: 10,
     margin: 10,
+    fontSize: 20,
+    borderRadius: 5,
+    width: '80%',
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: '#043346',
     padding: 10,
     margin: 10,
     borderRadius: 5,
+  },
+  textButton: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 })
