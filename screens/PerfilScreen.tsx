@@ -1,22 +1,58 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
+import { supabase } from '../supabase/Config'
+import { useNavigation } from '@react-navigation/native';
+
 
 export default function PerfilScreen() {
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [edad, setEdad] = useState('')
 
+  async function leerUsuario() {
+    const { data: { user } } = await supabase.auth.getUser()
+    //console.log(user?.id);
+    traerUsuario(user?.id)
+
+  }
+
+  async function traerUsuario(uid: any) {
+    const { data, error } = await supabase
+      .from('jugadores')
+      .select()
+      .eq('id', uid)
+      console.log(data![0].nombre);
+      setEdad(data![0].edad);
+      setEmail(data![0].correo)
+      setNombre(data![0].nombre)
+
+      
+
+  }
+
+  useEffect(() => {
+    leerUsuario()
+  }, [])
+
+  async function logout(){
+    const { error } = await supabase.auth.signOut()
+    if (error!){
+      
+    }
+  }
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>PerfilScreen</Text>
       <MaterialIcons name='person' size={300} color='black' />
-      
+
       <Text style={styles.text}>Nombre: {nombre}</Text>
       <Text style={styles.text}>Email: {email}</Text>
       <Text style={styles.text}>Edad: {edad}</Text>
 
-      <TouchableOpacity onPress={() => null} style={styles.button}>
+      <TouchableOpacity onPress={(logout) => null} style={styles.button}>
         <Text style={styles.textButton}>Cerrar sesión</Text>
       </TouchableOpacity>
     </View>

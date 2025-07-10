@@ -1,10 +1,28 @@
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
+import { supabase } from '../supabase/Config'
 
-export default function LoginScreen( {navigation}: any) {
+export default function LoginScreen({ navigation }: any) {
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
+
+  async function login() {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: correo,
+      password: contrasena,
+    })
+    //console.log(data);  
+    //console.log(error);
+    
+    if( data.user!=null){
+      navigation.navigate("Perfil")
+      
+    }else{
+      Alert.alert("Eror", error?.message)
+    }
+    
+  }
 
 
   return (
@@ -12,12 +30,13 @@ export default function LoginScreen( {navigation}: any) {
 
       <Text style={styles.title}>LoginScreen</Text>
       <MaterialIcons name='login' size={30} color='black' />
-      <TextInput placeholder='Email'  style={styles.input} onChangeText={setCorreo}/>
-      <TextInput placeholder='Password' style={styles.input} onChangeText={setContrasena}/>
+      <TextInput placeholder='Email' style={styles.input} onChangeText={setCorreo} />
+      <TextInput placeholder='Password' style={styles.input} onChangeText={setContrasena} />
 
-     <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}>
-      <Text style={styles.textButton}>Login</Text>
-     </TouchableOpacity>
+      <TouchableOpacity onPress={() => login()}
+        style={styles.button}>
+        <Text style={styles.textButton}>Login</Text>
+      </TouchableOpacity>
     </View>
   )
 }
