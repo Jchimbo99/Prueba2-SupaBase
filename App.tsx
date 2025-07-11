@@ -4,7 +4,7 @@ import Navegador from './navigations/MainNavigator';
 
 export default function App() {
   return (
-    <Navegador />
+    <Navegador/>
   );
 }
 

@@ -1,75 +1,106 @@
-import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
-import { supabase } from '../supabase/Config'
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import { supabase } from '../supabase/Config';
 
 export default function LoginScreen({ navigation }: any) {
-  const [correo, setCorreo] = useState('')
-  const [contrasena, setContrasena] = useState('')
+  const [correo, setCorreo] = useState('');
+  const [contrasena, setContrasena] = useState('');
 
   async function login() {
+    if (!correo || !contrasena) {
+      Alert.alert('Error', 'Por favor ingresa email y contraseña.');
+      return;
+    }
+
+    // Validar formato email básico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(correo)) {
+      Alert.alert('Error', 'Correo electrónico no válido.');
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: correo,
       password: contrasena,
-    })
-    //console.log(data);  
-    //console.log(error);
-    
-    if( data.user!=null){
-      navigation.navigate("Perfil")
-      
-    }else{
-      Alert.alert("Eror", error?.message)
-    }
-    
-  }
+    });
 
+    if (data.user) {
+      navigation.replace('App'); // Reemplaza para evitar volver a login con back
+    } else {
+      // Validar mensajes comunes de error
+      if (error?.message?.includes('Invalid login credentials')) {
+        Alert.alert('Error', 'Correo o contraseña incorrectos.');
+      } else {
+        Alert.alert('Error', error?.message || 'Error desconocido');
+      }
+    }
+  }
 
   return (
     <View style={styles.container}>
+      <MaterialIcons name="lock" size={100} color="#043346" style={styles.icon} />
+      <Text style={styles.title}>LOGIN</Text>
 
-      <Text style={styles.title}>LoginScreen</Text>
-      <MaterialIcons name='login' size={30} color='black' />
-      <TextInput placeholder='Email' style={styles.input} onChangeText={setCorreo} />
-      <TextInput placeholder='Password' style={styles.input} onChangeText={setContrasena} />
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
+        onChangeText={setCorreo}
+        value={correo}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <TextInput
+        placeholder="Password"
+        secureTextEntry
+        style={styles.input}
+        onChangeText={setContrasena}
+        value={contrasena}
+      />
 
-      <TouchableOpacity onPress={() => login()}
-        style={styles.button}>
+      <TouchableOpacity onPress={login} style={styles.button}>
         <Text style={styles.textButton}>Login</Text>
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  icon: {
     marginBottom: 20,
   },
+  title: {
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    marginBottom: 30, 
+    color: '#043346',
+  },
   input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    padding: 10,
-    margin: 10,
-    fontSize: 20,
-    borderRadius: 5,
+    borderWidth: 1, 
+    borderColor: 'gray', 
+    padding: 10, 
+    marginVertical: 10,
+    fontSize: 18, 
+    borderRadius: 8, 
     width: '80%',
   },
   button: {
-    backgroundColor: '#043346',
-    padding: 10,
-    margin: 10,
-    borderRadius: 5,
+    backgroundColor: '#043346', 
+    paddingVertical: 12, 
+    paddingHorizontal: 30,
+    borderRadius: 8, 
+    marginTop: 20,
   },
   textButton: {
-    color: 'white',
-    fontSize: 20,
+    color: 'white', 
+    fontSize: 18, 
     fontWeight: 'bold',
   },
-})
+});

@@ -1,90 +1,148 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
-import { supabase } from '../supabase/Config'
+import { StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import { supabase } from '../supabase/Config';
 import { useNavigation } from '@react-navigation/native';
 
-
 export default function PerfilScreen() {
-  const [nombre, setNombre] = useState('')
-  const [email, setEmail] = useState('')
-  const [edad, setEdad] = useState('')
+  const navigation = useNavigation();
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState('');
+  const [edad, setEdad] = useState('');
+  const [celular, setCelular] = useState('');
 
   async function leerUsuario() {
-    const { data: { user } } = await supabase.auth.getUser()
-    //console.log(user?.id);
-    traerUsuario(user?.id)
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
+    if (userError || !user) {
+      Alert.alert('Error', 'No se pudo obtener usuario');
+      return;
+    }
+
+    traerUsuario(user.id);
   }
 
-  async function traerUsuario(uid: any) {
+  async function traerUsuario(uid: string) {
     const { data, error } = await supabase
-      .from('jugadores')
+      .from('administracion')
       .select()
       .eq('id', uid)
-      console.log(data![0].nombre);
-      setEdad(data![0].edad);
-      setEmail(data![0].correo)
-      setNombre(data![0].nombre)
+      .single();
 
-      
+    if (error || !data) {
+      Alert.alert('Error', 'No se pudieron cargar los datos del usuario');
+      return;
+    }
 
+    setNombre(data.nombre);
+    setEdad(data.edad || '');
+    setEmail(data.correo);
+    setCelular(data.celular || '');
   }
 
   useEffect(() => {
-    leerUsuario()
-  }, [])
+    leerUsuario();
+  }, []);
 
-  async function logout(){
-    const { error } = await supabase.auth.signOut()
-    if (error!){
-      
+  async function logout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      Alert.alert('Error', 'No se pudo cerrar sesión');
+    } else {
+      // Navegar a Home y resetear historial para evitar regresar con back button
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' as never }],
+      });
     }
   }
 
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PerfilScreen</Text>
-      <MaterialIcons name='person' size={300} color='black' />
+      <MaterialIcons name="person" size={150} color="#043346" />
+      <Text style={styles.bienvenida}>Hola, {nombre} 👋</Text>
+      <Text style={styles.autorizacion}>
+        Autorización de uso de datos: <Text style={{ color: 'green' }}>ACTIVADO</Text>
+      </Text>
+      <Text style={styles.mensaje}>Mantén actualizados tus datos</Text>
 
-      <Text style={styles.text}>Nombre: {nombre}</Text>
-      <Text style={styles.text}>Email: {email}</Text>
-      <Text style={styles.text}>Edad: {edad}</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Nombre:</Text>
+        <Text style={styles.value}>{nombre}</Text>
+      </View>
 
-      <TouchableOpacity onPress={(logout) => null} style={styles.button}>
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Número de celular:</Text>
+        <Text style={styles.value}>{celular}</Text>
+      </View>
+
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Correo electrónico:</Text>
+        <Text style={styles.value}>{email}</Text>
+      </View>
+
+      <TouchableOpacity onPress={logout} style={styles.button}>
         <Text style={styles.textButton}>Cerrar sesión</Text>
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#f0f6f7',
     alignItems: 'center',
-    backgroundColor: '#748ccb',
+    padding: 20,
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
+  bienvenida: {
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginTop: 15,
+    color: '#043346',
   },
-  text: {
-    fontSize: 20,
+  autorizacion: {
+    fontSize: 16,
+    marginTop: 10,
+    marginBottom: 5,
+    fontWeight: '600',
+  },
+  mensaje: {
+    fontSize: 14,
+    marginBottom: 20,
+    fontStyle: 'italic',
+    color: '#555',
+  },
+  infoContainer: {
+    width: '100%',
+    marginBottom: 12,
+    flexDirection: 'row',
+  },
+  label: {
     fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 18,
+    color: '#043346',
+    width: 150,
+  },
+  value: {
+    fontSize: 18,
+    color: '#333',
+    flexShrink: 1,
   },
   button: {
+    marginTop: 30,
     backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 8,
   },
   textButton: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
-})
+});
