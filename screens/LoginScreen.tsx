@@ -13,7 +13,7 @@ export default function LoginScreen({ navigation }: any) {
       return;
     }
 
-    // Validar formato email básico
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(correo)) {
       Alert.alert('Error', 'Correo electrónico no válido.');
@@ -26,9 +26,9 @@ export default function LoginScreen({ navigation }: any) {
     });
 
     if (data.user) {
-      navigation.replace('App'); // Reemplaza para evitar volver a login con back
+      navigation.replace('App'); 
     } else {
-      // Validar mensajes comunes de error
+      
       if (error?.message?.includes('Invalid login credentials')) {
         Alert.alert('Error', 'Correo o contraseña incorrectos.');
       } else {

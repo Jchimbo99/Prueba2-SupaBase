@@ -77,11 +77,11 @@ export default function HistorialScreen() {
             <Icon name={icono} size={80} color="#043346" style={{ marginBottom: 20 }} />
 
             {itemSeleccionado && (() => {
-              // Intentamos leer propiedades con diferentes posibles nombres
+            
               const precioUnitario = itemSeleccionado.monto ?? itemSeleccionado.precio ?? 0;
               const cantidad = itemSeleccionado.cantidad ?? itemSeleccionado.qty ?? 0;
 
-              // Para evitar que 0 sea interpretado como dato válido cuando está vacío, usamos nullish coalescing con condiciones:
+
               const precioValido = precioUnitario !== 0 && precioUnitario !== null && precioUnitario !== undefined;
               const cantidadValida = cantidad !== 0 && cantidad !== null && cantidad !== undefined;
 

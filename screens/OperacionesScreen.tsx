@@ -61,7 +61,7 @@ export default function OperacionesScreen() {
             console.error(error);
         } else {
             Alert.alert('Éxito', 'Operación guardada correctamente.');
-            // Limpiar campos y generar nuevo ID
+            
             setDescripcion('');
             setCantidad('');
             setMonto('');

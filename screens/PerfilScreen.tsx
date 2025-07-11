@@ -52,7 +52,7 @@ export default function PerfilScreen() {
     if (error) {
       Alert.alert('Error', 'No se pudo cerrar sesión');
     } else {
-      // Navegar a Home y resetear historial para evitar regresar con back button
+      
       navigation.reset({
         index: 0,
         routes: [{ name: 'Home' as never }],
